@@ -21,10 +21,10 @@ val credentialsProvider = new ClasspathPropertiesFileCredentialsProvider()
 val kinesisClient = AmazonKinesisClient(credentialsProvider)
 
 val putRecordRequest = new PutRecordRequest(
-  streamName   = "spark-test",
-  partitionKey = "key1",
-  data         = "test".getBytes("UTF-8")
+  streamName   = "streamName",
+  partitionKey = "partitionKey",
+  data         = "data".getBytes("UTF-8")
 )
 
-kinesisClient.putRecordAsync(putRecordRequest)
+kinesisClient.putRecord(putRecordRequest)
 ```
