@@ -58,6 +58,15 @@ class AmazonKinesisAsyncClient(client: AWSKinesisAsyncClient) {
     p.future
   }
 
+  def putRecordsAsync(request: PutRecordsRequest): Future[PutRecordsResult] = {
+    val p = Promise[PutRecordsResult]
+    client.putRecordsAsync(request, new AsyncHandler[AWSPutRecordsRequest, AWSPutRecordsResult]{
+      override def onError(e: Exception): Unit = p.failure(e)
+      override def onSuccess(req: AWSPutRecordsRequest, res: AWSPutRecordsResult): Unit = p.success(res)
+    })
+    p.future
+  }
+
   def shutdown(): Unit = {
     client.shutdown()
   }
