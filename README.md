@@ -8,7 +8,7 @@ Scala client for Amazon Kinesis
 Add a following dependency into your `build.sbt` at first.
 
 ```scala
-libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-scala" % "0.0.1-SNAPSHOT"
+libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-scala" % "0.0.1"
 ```
 
 Then you can access Kinesis as following:
