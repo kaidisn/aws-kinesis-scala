@@ -1,8 +1,5 @@
 package jp.co.bizreach.kinesis
 
-import com.amazonaws.services.kinesis.{AmazonKinesisClient => AWSKinesisClient}
-
-import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.ClientConfiguration
 
