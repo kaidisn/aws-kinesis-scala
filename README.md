@@ -20,7 +20,7 @@ import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider
 val credentialsProvider = new ClasspathPropertiesFileCredentialsProvider()
 val kinesisClient = AmazonKinesisClient(credentialsProvider)
 
-val putRecordRequest = new PutRecordRequest(
+val putRecordRequest = PutRecordRequest(
   streamName   = "streamName",
   partitionKey = "partitionKey",
   data         = "data".getBytes("UTF-8")
