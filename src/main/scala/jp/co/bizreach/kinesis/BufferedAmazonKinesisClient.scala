@@ -2,7 +2,6 @@ package jp.co.bizreach.kinesis
 
 import java.util.concurrent.{TimeUnit, Executors}
 
-import scala.collection.mutable.Queue
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
 
@@ -23,18 +22,14 @@ object BufferedAmazonKinesisClient {
 
 class BufferedAmazonKinesisClient(client: AmazonKinesisClient, amount: Int, interval: Long) {
 
-  private val queue = new Queue[Any]
+  private val queue = new java.util.concurrent.ConcurrentLinkedQueue[Any]
 
   private val scheduler = Executors.newSingleThreadScheduledExecutor()
   scheduler.scheduleAtFixedRate(new BufferedKinesisSendTask(), 0, interval, TimeUnit.MILLISECONDS)
 
-  def putRecord(request: PutRecordRequest): Unit = {
-    queue += request
-  }
+  def putRecord(request: PutRecordRequest): Unit = queue.add(request)
 
-  def putRecords(request: PutRecordsRequest): Unit = {
-    queue += request
-  }
+  def putRecords(request: PutRecordsRequest): Unit = queue.add(request)
 
   def shutdown(): Unit = {
     scheduler.shutdownNow()
@@ -53,7 +48,7 @@ class BufferedAmazonKinesisClient(client: AmazonKinesisClient, amount: Int, inte
 
     override def run(): Unit = {
       try {
-        val requests = for(i <- 1 to amount if queue.nonEmpty) yield queue.dequeue()
+        val requests = for(i <- 1 to amount if queue.size() != 0) yield queue.poll()
         requests.foreach {
           case r: PutRecordRequest  => client.putRecord(r)
           case r: PutRecordsRequest => client.putRecords(r)
