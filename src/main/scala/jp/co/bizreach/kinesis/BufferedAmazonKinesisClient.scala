@@ -20,6 +20,7 @@ object BufferedAmazonKinesisClient {
   }
 }
 
+// TODO Would like to provide DiskBufferClient also
 class BufferedAmazonKinesisClient(client: AmazonKinesisClient, amount: Int, interval: Long) {
 
   private val queue = new java.util.concurrent.ConcurrentLinkedQueue[Any]
