@@ -1,7 +1,7 @@
 package jp.co.bizreach.kinesis
 
-import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.ClientConfiguration
+import com.amazonaws.auth.AWSCredentialsProvider
 
 object AmazonKinesisClient {
   def apply(): AmazonKinesisClient = {

@@ -1,15 +1,15 @@
 package jp.co.bizreach.kinesis
 
-import com.amazonaws.services.kinesis.model.{PutRecordRequest => AWSPutRecordRequest}
-import com.amazonaws.services.kinesis.model.{PutRecordResult => AWSPutRecordResult}
-import com.amazonaws.services.kinesis.model.{PutRecordsRequest => AWSPutRecordsRequest}
-import com.amazonaws.services.kinesis.model.{PutRecordsResult => AWSPutRecordsResult}
-
-import com.amazonaws.services.kinesis.{AmazonKinesisAsyncClient => AWSKinesisAsyncClient}
-
-import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.ClientConfiguration
+import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.handlers.AsyncHandler
+import com.amazonaws.services.kinesis.{AmazonKinesisAsyncClient => AWSKinesisAsyncClient}
+import com.amazonaws.services.kinesis.model.{
+  PutRecordRequest => AWSPutRecordRequest,
+  PutRecordResult => AWSPutRecordResult,
+  PutRecordsRequest => AWSPutRecordsRequest,
+  PutRecordsResult => AWSPutRecordsResult}
+
 import scala.concurrent._
 
 object AmazonKinesisAsyncClient {
