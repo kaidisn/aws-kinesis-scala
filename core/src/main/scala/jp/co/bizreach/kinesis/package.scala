@@ -30,8 +30,6 @@ import scala.language.implicitConversions
 
 package object kinesis {
 
-  type AmazonKinesisClient = com.amazonaws.services.kinesis.AmazonKinesisClient
-
   case class AddTagsToStreamRequest(streamName: String, tags: Map[String, String])
 
   implicit def convertAddTagsToStreamRequest(request: AddTagsToStreamRequest): AWSAddTagsToStreamRequest = {

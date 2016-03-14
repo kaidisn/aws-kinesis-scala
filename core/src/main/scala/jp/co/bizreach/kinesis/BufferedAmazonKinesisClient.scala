@@ -7,16 +7,16 @@ import com.amazonaws.auth.AWSCredentialsProvider
 
 object BufferedAmazonKinesisClient {
   def apply(amount: Int, interval: Long): BufferedAmazonKinesisClient = {
-    new BufferedAmazonKinesisClient(new AmazonKinesisClient(), amount, interval)
+    new BufferedAmazonKinesisClient(AmazonKinesisClient(), amount, interval)
   }
   def apply(awsCredentialsProvider: AWSCredentialsProvider, amount: Int, interval: Long): BufferedAmazonKinesisClient = {
-    new BufferedAmazonKinesisClient(new AmazonKinesisClient(awsCredentialsProvider), amount, interval)
+    new BufferedAmazonKinesisClient(AmazonKinesisClient(awsCredentialsProvider), amount, interval)
   }
   def apply(clientConfiguration: ClientConfiguration, amount: Int, interval: Long): BufferedAmazonKinesisClient = {
-    new BufferedAmazonKinesisClient(new AmazonKinesisClient(clientConfiguration), amount, interval)
+    new BufferedAmazonKinesisClient(AmazonKinesisClient(clientConfiguration), amount, interval)
   }
   def apply(awsCredentialsProvider: AWSCredentialsProvider, clientConfiguration: ClientConfiguration, amount: Int, interval: Long): BufferedAmazonKinesisClient = {
-    new BufferedAmazonKinesisClient(new AmazonKinesisClient(awsCredentialsProvider, clientConfiguration), amount, interval)
+    new BufferedAmazonKinesisClient(AmazonKinesisClient(awsCredentialsProvider, clientConfiguration), amount, interval)
   }
 }
 
