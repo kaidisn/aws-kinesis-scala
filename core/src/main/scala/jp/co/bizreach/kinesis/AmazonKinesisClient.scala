@@ -2,21 +2,22 @@ package jp.co.bizreach.kinesis
 
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.regions.Region
 import com.amazonaws.services.kinesis.{AmazonKinesisClient => AWSKinesisClient}
 import jp.co.bizreach.kinesis.action.PutRecordAction
 
 object AmazonKinesisClient {
-  def apply(): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient()) with PutRecordAction
+  def apply()(implicit region: Region): AmazonKinesisClient = {
+    new AmazonKinesisClient(new AWSKinesisClient().withRegion(region)) with PutRecordAction
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient(awsCredentialsProvider)) with PutRecordAction
+  def apply(awsCredentialsProvider: AWSCredentialsProvider)(implicit region: Region): AmazonKinesisClient = {
+    new AmazonKinesisClient(new AWSKinesisClient(awsCredentialsProvider).withRegion(region)) with PutRecordAction
   }
-  def apply(clientConfiguration: ClientConfiguration): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient(clientConfiguration)) with PutRecordAction
+  def apply(clientConfiguration: ClientConfiguration)(implicit region: Region): AmazonKinesisClient = {
+    new AmazonKinesisClient(new AWSKinesisClient(clientConfiguration).withRegion(region)) with PutRecordAction
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider, clientConfiguration: ClientConfiguration): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient(awsCredentialsProvider, clientConfiguration)) with PutRecordAction
+  def apply(awsCredentialsProvider: AWSCredentialsProvider, clientConfiguration: ClientConfiguration)(implicit region: Region): AmazonKinesisClient = {
+    new AmazonKinesisClient(new AWSKinesisClient(awsCredentialsProvider, clientConfiguration).withRegion(region)) with PutRecordAction
   }
 }
 

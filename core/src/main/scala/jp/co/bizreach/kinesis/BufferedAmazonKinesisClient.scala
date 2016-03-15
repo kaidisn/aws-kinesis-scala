@@ -4,18 +4,19 @@ import java.util.concurrent.{TimeUnit, Executors}
 
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.regions.Region
 
 object BufferedAmazonKinesisClient {
-  def apply(amount: Int, interval: Long): BufferedAmazonKinesisClient = {
+  def apply(amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
     new BufferedAmazonKinesisClient(AmazonKinesisClient(), amount, interval)
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider, amount: Int, interval: Long): BufferedAmazonKinesisClient = {
+  def apply(awsCredentialsProvider: AWSCredentialsProvider, amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
     new BufferedAmazonKinesisClient(AmazonKinesisClient(awsCredentialsProvider), amount, interval)
   }
-  def apply(clientConfiguration: ClientConfiguration, amount: Int, interval: Long): BufferedAmazonKinesisClient = {
+  def apply(clientConfiguration: ClientConfiguration, amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
     new BufferedAmazonKinesisClient(AmazonKinesisClient(clientConfiguration), amount, interval)
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider, clientConfiguration: ClientConfiguration, amount: Int, interval: Long): BufferedAmazonKinesisClient = {
+  def apply(awsCredentialsProvider: AWSCredentialsProvider, clientConfiguration: ClientConfiguration, amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
     new BufferedAmazonKinesisClient(AmazonKinesisClient(awsCredentialsProvider, clientConfiguration), amount, interval)
   }
 }

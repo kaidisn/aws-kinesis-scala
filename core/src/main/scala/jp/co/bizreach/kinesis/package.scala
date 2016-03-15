@@ -231,8 +231,14 @@ package object kinesis {
     )
   }
 
+  val recordsMaxCount = 500
+  val recordMaxDataSize = 1024 * 1024
+  val recordsMaxDataSize = 1024 * 1024 * 5
+
   case class PutRecordsRequest(streamName: String, records: Seq[PutRecordsEntry])
-  case class PutRecordsEntry(partitionKey: String, data: Array[Byte], explicitHashKey: Option[String] = None)
+  case class PutRecordsEntry(partitionKey: String, data: Array[Byte], explicitHashKey: Option[String] = None){
+    val recordSize = partitionKey.getBytes.length + data.length
+  }
 
   implicit def convertPutRecordsRequest(request: PutRecordsRequest): AWSPutRecordsRequest = {
     val entries = request.records.map { entry =>
