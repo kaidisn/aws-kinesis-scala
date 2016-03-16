@@ -4,20 +4,20 @@ import java.util.concurrent.{TimeUnit, Executors}
 
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.regions.Region
+import com.amazonaws.regions.Regions
 
 object BufferedAmazonKinesisClient {
-  def apply(amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
+  def apply(amount: Int, interval: Long)(implicit region: Regions): BufferedAmazonKinesisClient = {
     new BufferedAmazonKinesisClient(AmazonKinesisClient(), amount, interval)
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider, amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
-    new BufferedAmazonKinesisClient(AmazonKinesisClient(awsCredentialsProvider), amount, interval)
+  def apply(credentials: AWSCredentialsProvider, amount: Int, interval: Long)(implicit region: Regions): BufferedAmazonKinesisClient = {
+    new BufferedAmazonKinesisClient(AmazonKinesisClient(credentials), amount, interval)
   }
-  def apply(clientConfiguration: ClientConfiguration, amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
-    new BufferedAmazonKinesisClient(AmazonKinesisClient(clientConfiguration), amount, interval)
+  def apply(config: ClientConfiguration, amount: Int, interval: Long)(implicit region: Regions): BufferedAmazonKinesisClient = {
+    new BufferedAmazonKinesisClient(AmazonKinesisClient(config), amount, interval)
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider, clientConfiguration: ClientConfiguration, amount: Int, interval: Long)(implicit region: Region): BufferedAmazonKinesisClient = {
-    new BufferedAmazonKinesisClient(AmazonKinesisClient(awsCredentialsProvider, clientConfiguration), amount, interval)
+  def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration, amount: Int, interval: Long)(implicit region: Regions): BufferedAmazonKinesisClient = {
+    new BufferedAmazonKinesisClient(AmazonKinesisClient(credentials, config), amount, interval)
   }
 }
 

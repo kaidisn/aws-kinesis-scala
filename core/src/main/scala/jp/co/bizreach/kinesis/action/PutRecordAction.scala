@@ -1,7 +1,10 @@
 package jp.co.bizreach.kinesis.action
 
+import com.amazonaws.retry.PredefinedRetryPolicies.DEFAULT_MAX_ERROR_RETRY
 import com.amazonaws.services.kinesis.model.ProvisionedThroughputExceededException
+
 import jp.co.bizreach.kinesis._
+import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
 import scala.math.pow
@@ -9,7 +12,9 @@ import scala.util.Random
 
 trait PutRecordAction {
 
-  protected val retryLimit = 3
+  private val logger = LoggerFactory.getLogger(getClass)
+
+  protected val retryLimit = DEFAULT_MAX_ERROR_RETRY
 
   @tailrec
   final def withRetry(records: Seq[PutRecordsEntry], retry: Int = 0)
@@ -28,7 +33,7 @@ trait PutRecordAction {
       // retry
       case _ =>
         Thread.sleep(sleepDuration(retry))
-//        log.warn sprintf('Retrying to put records. Retry count: %d', retry_count)
+        logger.warn(s"Retrying to put records. Retry count: ${retry + 1}")
         withRetry(
           records = result.records.zipWithIndex.collect {
             case (entry, i) if Option(entry.errorCode).isDefined => records(i)
@@ -45,7 +50,7 @@ trait PutRecordAction {
     catch {
       case e: ProvisionedThroughputExceededException => if (retry >= retryLimit) Left(e) else {
         Thread.sleep(sleepDuration(retry))
-//        log.warn sprintf('Retrying to put records. Retry count: %d', retry_count)
+        logger.warn(s"Retrying to put records. Retry count: ${retry + 1}")
         withRetry(retry + 1)(f)
       }
     }

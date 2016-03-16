@@ -3,9 +3,11 @@ name := "aws-kinesis-scala"
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
   version := "0.0.2-SNAPSHOT",
-  scalaVersion := "2.11.7",
+  scalaVersion := "2.11.8",
   resolvers ++= Seq(),
-  libraryDependencies ++= Seq(),
+  libraryDependencies ++= Seq(
+    "org.slf4j" % "slf4j-api" % "1.7.19"
+  ),
   scalacOptions ++= Seq("-feature", "-deprecation"),
   publishTo <<= version { (v: String) =>
     val nexus = "https://oss.sonatype.org/"
@@ -31,6 +33,12 @@ lazy val commonSettings = Seq(
         <id>takezoe</id>
         <name>Naoki Takezoe</name>
         <email>naoki.takezoe_at_bizreach.co.jp</email>
+        <timezone>+9</timezone>
+      </developer>
+      <developer>
+        <id>shimamoto</id>
+        <name>Takako Shimamoto</name>
+        <email>takako.shimamoto_at_bizreach.co.jp</email>
         <timezone>+9</timezone>
       </developer>
     </developers>

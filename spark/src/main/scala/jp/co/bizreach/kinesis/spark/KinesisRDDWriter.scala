@@ -1,19 +1,24 @@
 package jp.co.bizreach.kinesis.spark
 
+import com.amazonaws.auth.InstanceProfileCredentialsProvider
+import com.amazonaws.regions.Regions
 import jp.co.bizreach.kinesis._
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.spark.TaskContext
 import org.json4s.jackson.JsonMethods
 import org.json4s.{Extraction, Formats, DefaultFormats}
+import org.slf4j.LoggerFactory
 
-class KinesisRDDWriter[A <: AnyRef](client: AmazonKinesisClient,
-                                    streamName: String, chunk: Int) extends Serializable {
+class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions, chunk: Int) extends Serializable {
+  import KinesisRDDWriter.client
+
+  private val logger = LoggerFactory.getLogger(getClass)
 
   val write = (task: TaskContext, data: Iterator[A]) => {
     // send data, including retry
-    def put(a: Seq[PutRecordsEntry]) = client.putRecordsWithRetry(PutRecordsRequest(streamName, a))
+    def put(a: Seq[PutRecordsEntry]) = client(region).putRecordsWithRetry(PutRecordsRequest(streamName, a))
       .left.getOrElse(Nil)
-      .map(e => e._1 -> e._2.errorCode)
+      .map(e => e._1 -> s"${e._2.errorCode}: ${e._2.errorMessage}")
 
     val errors = data.foldLeft(
       (Nil: Seq[PutRecordsEntry], Nil: Seq[(PutRecordsEntry, String)])
@@ -38,14 +43,26 @@ class KinesisRDDWriter[A <: AnyRef](client: AmazonKinesisClient,
       case (rest, e) => put(rest) ++ e
     }
 
-    // could not put record
+    // failed records
     if (errors.nonEmpty) dump(errors)
   }
 
-  // TODO
-  protected def dump(failed: Seq[(PutRecordsEntry, String)]): Unit = ???
+  protected def dump(errors: Seq[(PutRecordsEntry, String)]): Unit =
+    logger.error(
+      s"""Could not put record, count: ${errors.size}, following details:
+         |${errors map { case (entry, message) => message + "\n" + new String(entry.data, "UTF-8") } mkString "\n"}
+       """.stripMargin)
 
   protected def serialize(a: A)(implicit formats: Formats = DefaultFormats): Array[Byte] =
     JsonMethods.mapper.writeValueAsBytes(Extraction.decompose(a)(formats))
+
+}
+
+object KinesisRDDWriter {
+  private val cache = collection.concurrent.TrieMap.empty[Regions, AmazonKinesisClient]
+
+  private val client: Regions => AmazonKinesisClient = { implicit region =>
+    cache.getOrElseUpdate(region, AmazonKinesisClient(new InstanceProfileCredentialsProvider()))
+  }
 
 }
