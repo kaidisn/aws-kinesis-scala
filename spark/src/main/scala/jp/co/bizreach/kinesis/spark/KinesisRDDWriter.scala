@@ -16,9 +16,9 @@ class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions, chunk: 
 
   val write = (task: TaskContext, data: Iterator[A]) => {
     // send data, including retry
-    def put(a: Seq[PutRecordsEntry]) = client(region).putRecordsWithRetry(PutRecordsRequest(streamName, a))
-      .left.getOrElse(Nil)
-      .map(e => e._1 -> s"${e._2.errorCode}: ${e._2.errorMessage}")
+    def put(a: Seq[PutRecordsEntry]) =
+      client(region).putRecordsWithRetry(PutRecordsRequest(streamName, a))
+        .zipWithIndex.collect { case (Left(e), i) => a(i) -> s"${e.errorCode}: ${e.errorMessage}" }
 
     val errors = data.foldLeft(
       (Nil: Seq[PutRecordsEntry], Nil: Seq[(PutRecordsEntry, String)])

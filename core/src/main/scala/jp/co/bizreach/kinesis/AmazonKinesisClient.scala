@@ -24,22 +24,66 @@ object AmazonKinesisClient {
 class AmazonKinesisClient(client: AWSKinesisClient) {
   self: PutRecordAction =>
 
-  def putRecord(request: PutRecordRequest): PutRecordResult = {
-    client.putRecord(request)
-  }
-
-  def putRecordWithRetry(request: PutRecordRequest): Either[Throwable, PutRecordResult] = {
-    withRetry(0){
+  /**
+   * Writes a single data record from a producer into an Amazon Kinesis stream.
+   *
+   * Note: This method does not perform retry processing.
+   *
+   * @param request Represents the input for PutRecord
+   * @return Right is result of the PutRecord operation on success.
+   *         Left is the occurred error on failure.
+   */
+  def putRecord(request: PutRecordRequest): Either[Throwable, PutRecordResult] = {
+    withPutRetry(0){ // not retry
       client.putRecord(request)
     }
   }
 
-  def putRecords(request: PutRecordsRequest): PutRecordsResult = {
-    client.putRecords(request)
+  /**
+   * Writes a single data record from a producer into an Amazon Kinesis stream.
+   *
+   * Note: This method does perform retry processing. Max retry count is 3 (SDK default).
+   *
+   * @param request Represents the input for PutRecord
+   * @return Right is result of the PutRecord operation on success.
+   *         Left is the occurred error on failure.
+   */
+  def putRecordWithRetry(request: PutRecordRequest): Either[Throwable, PutRecordResult] = {
+    withPutRetry(){
+      client.putRecord(request)
+    }
   }
 
-  def putRecordsWithRetry(request: PutRecordsRequest): Either[Seq[(PutRecordsEntry, PutRecordsResultEntry)], Unit] = {
-    withRetry(request.records){ entry =>
+  /**
+   * Writes multiple data records from a producer into an Amazon Kinesis stream in a single call.
+   * The response Records sequence always includes the same number of records as the request sequence
+   * by same ordering.
+   *
+   * Note: This method does not perform retry processing.
+   *
+   * @param request Represents the input for PutRecords
+   * @return each record result. Right is result of the PutRecords operation on success.
+   *         Left is the occurred error on failure.
+   */
+  def putRecords(request: PutRecordsRequest): Seq[Either[PutRecordsResultEntry, PutRecordsResultEntry]] = {
+    withPutsRetry(request.records, 0){ entry => // not retry
+      client.putRecords(PutRecordsRequest(request.streamName, entry))
+    }
+  }
+
+  /**
+   * Writes multiple data records from a producer into an Amazon Kinesis stream in a single call.
+   * The response Records sequence always includes the same number of records as the request sequence
+   * by same ordering.
+   *
+   * Note: This method does perform retry processing. Max retry count is 3 (SDK default).
+   *
+   * @param request Represents the input for PutRecords
+   * @return each record result. Right is result of the PutRecords operation on success.
+   *         Left is the occurred error on failure.
+   */
+  def putRecordsWithRetry(request: PutRecordsRequest): Seq[Either[PutRecordsResultEntry, PutRecordsResultEntry]] = {
+    withPutsRetry(request.records){ entry =>
       client.putRecords(PutRecordsRequest(request.streamName, entry))
     }
   }
