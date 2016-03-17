@@ -5,9 +5,7 @@ lazy val commonSettings = Seq(
   version := "0.0.2-SNAPSHOT",
   scalaVersion := "2.11.8",
   resolvers ++= Seq(),
-  libraryDependencies ++= Seq(
-    "org.slf4j" % "slf4j-api" % "1.7.19"
-  ),
+  libraryDependencies ++= Seq(),
   scalacOptions ++= Seq("-feature", "-deprecation"),
   publishTo <<= version { (v: String) =>
     val nexus = "https://oss.sonatype.org/"
@@ -17,7 +15,7 @@ lazy val commonSettings = Seq(
   publishArtifact in Test := false,
   publishMavenStyle := true,
   pomExtra := (
-    <url>https://github.com/bizreach/dynamodb4s</url>
+    <url>https://github.com/bizreach/aws-kinesis-scala</url>
     <licenses>
       <license>
         <name>The Apache Software License, Version 2.0</name>
@@ -48,13 +46,17 @@ lazy val commonSettings = Seq(
 lazy val root = (project in file("."))
   .aggregate(core, spark)
   .settings(commonSettings: _*)
+  .settings(
+    packagedArtifacts := Map.empty
+  )
 
 lazy val core = project
   .settings(commonSettings: _*)
   .settings(
     name := "aws-kinesis-scala",
     libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk-kinesis" % "1.10.59"
+      "com.amazonaws" % "aws-java-sdk-kinesis" % "1.10.59",
+      "org.slf4j"     % "slf4j-api"            % "1.7.19"
     )
   )
 
