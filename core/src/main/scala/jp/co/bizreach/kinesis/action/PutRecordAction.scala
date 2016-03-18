@@ -44,7 +44,7 @@ trait PutRecordAction {
     }
 
     put0(records.zipWithIndex)
-    List.empty ++ buffer
+    buffer.toList
   }
 
   def withPutRetry(retryLimit: Int = DEFAULT_MAX_ERROR_RETRY)
