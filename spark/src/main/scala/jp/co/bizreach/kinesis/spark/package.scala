@@ -1,5 +1,7 @@
 package jp.co.bizreach.kinesis
 
+import com.amazonaws.{ClientConfiguration, PredefinedClientConfigurations}
+import com.amazonaws.auth.{DefaultAWSCredentialsProviderChain, AWSCredentialsProvider}
 import com.amazonaws.regions.Regions
 import org.apache.spark.rdd.RDD
 
@@ -14,11 +16,18 @@ package object spark {
      *
      * @param streamName Kinesis stream name
      * @param region region name
+     * @param credentials a credentials provider to use to constructs a new client.
+     *                    By default, [[DefaultAWSCredentialsProviderChain]]
+     * @param config The client configuration options controlling how this client connects to Kinesis.
+     *               By default, [[PredefinedClientConfigurations]] method `defaultConfig`
      * @param chunk record size in each PutRecords request. By default, 500
      */
-    def saveToKinesis(streamName: String, region: Regions, chunk: Int = recordsMaxCount): Unit =
-      if (!rdd.isEmpty)
-        rdd.sparkContext.runJob(rdd, new KinesisRDDWriter(streamName, region, chunk).write)
+    def saveToKinesis(streamName: String, region: Regions,
+                      credentials: Class[_ <: AWSCredentialsProvider] = classOf[DefaultAWSCredentialsProviderChain],
+                      config: ClientConfiguration = PredefinedClientConfigurations.defaultConfig,
+                      chunk: Int = recordsMaxCount): Unit =
+      if (!rdd.isEmpty) rdd.sparkContext.runJob(rdd,
+        new KinesisRDDWriter(streamName, region, credentials, config, chunk).write)
   }
 
 }
