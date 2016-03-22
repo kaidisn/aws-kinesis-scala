@@ -1,6 +1,5 @@
 package jp.co.bizreach.kinesis.spark
 
-import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.regions.Regions
 import jp.co.bizreach.kinesis._
@@ -11,13 +10,13 @@ import org.json4s.{Extraction, Formats, DefaultFormats}
 import org.slf4j.LoggerFactory
 
 class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
-                                    credentials: Class[_ <: AWSCredentialsProvider], config: ClientConfiguration,
+                                    credentials: Class[_ <: AWSCredentialsProvider],
                                     chunk: Int) extends Serializable {
   private val logger = LoggerFactory.getLogger(getClass)
 
   val write = (task: TaskContext, data: Iterator[A]) => {
     // send data, including retry
-    def put(a: Seq[PutRecordsEntry]) = KinesisRDDWriter.client(credentials, config)(region)
+    def put(a: Seq[PutRecordsEntry]) = KinesisRDDWriter.client(credentials)(region)
       .putRecordsWithRetry(PutRecordsRequest(streamName, a))
       .zipWithIndex.collect { case (Left(e), i) => a(i) -> s"${e.errorCode}: ${e.errorMessage}" }
 
@@ -62,9 +61,9 @@ class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
 object KinesisRDDWriter {
   private val cache = collection.concurrent.TrieMap.empty[Regions, AmazonKinesisClient]
 
-  private val client: (Class[_ <: AWSCredentialsProvider], ClientConfiguration) => Regions => AmazonKinesisClient = {
-    (credentials, config) => implicit region =>
-      cache.getOrElseUpdate(region, AmazonKinesisClient(credentials.getConstructor().newInstance(), config))
+  private val client: Class[_ <: AWSCredentialsProvider] => Regions => AmazonKinesisClient = {
+    credentials => implicit region =>
+      cache.getOrElseUpdate(region, AmazonKinesisClient(credentials.getConstructor().newInstance()))
   }
 
 }
