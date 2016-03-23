@@ -1,29 +1,30 @@
 package jp.co.bizreach.kinesis
 
-import com.amazonaws.services.kinesis.model.{PutRecordRequest => AWSPutRecordRequest}
-import com.amazonaws.services.kinesis.model.{PutRecordResult => AWSPutRecordResult}
-import com.amazonaws.services.kinesis.model.{PutRecordsRequest => AWSPutRecordsRequest}
-import com.amazonaws.services.kinesis.model.{PutRecordsResult => AWSPutRecordsResult}
-
-import com.amazonaws.services.kinesis.{AmazonKinesisAsyncClient => AWSKinesisAsyncClient}
-
-import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.ClientConfiguration
+import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.handlers.AsyncHandler
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.kinesis.{AmazonKinesisAsyncClient => AWSKinesisAsyncClient}
+import com.amazonaws.services.kinesis.model.{
+  PutRecordRequest => AWSPutRecordRequest,
+  PutRecordResult => AWSPutRecordResult,
+  PutRecordsRequest => AWSPutRecordsRequest,
+  PutRecordsResult => AWSPutRecordsResult}
+
 import scala.concurrent._
 
 object AmazonKinesisAsyncClient {
-  def apply(): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient())
+  def apply()(implicit region: Regions): AmazonKinesisAsyncClient = {
+    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient().withRegion(region))
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(awsCredentialsProvider))
+  def apply(credentials: AWSCredentialsProvider)(implicit region: Regions): AmazonKinesisAsyncClient = {
+    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(credentials).withRegion(region))
   }
-  def apply(clientConfiguration: ClientConfiguration): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(clientConfiguration))
+  def apply(config: ClientConfiguration)(implicit region: Regions): AmazonKinesisAsyncClient = {
+    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(config).withRegion(region))
   }
-  def apply(awsCredentialsProvider: AWSCredentialsProvider, clientConfiguration: ClientConfiguration): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(awsCredentialsProvider, clientConfiguration))
+  def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesisAsyncClient = {
+    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(credentials, config).withRegion(region))
   }
 }
 

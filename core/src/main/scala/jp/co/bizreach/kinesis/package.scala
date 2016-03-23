@@ -1,35 +1,34 @@
 package jp.co.bizreach
 
 import java.nio.ByteBuffer
+
+import com.amazonaws.services.kinesis.model.{
+  AddTagsToStreamRequest => AWSAddTagsToStreamRequest,
+  CreateStreamRequest => AWSCreateStreamRequest,
+  DeleteStreamRequest => AWSDeleteStreamRequest,
+  DescribeStreamRequest => AWSDescribeStreamRequest,
+  DescribeStreamResult => AWSDescribeStreamResult,
+  GetRecordsRequest => AWSGetRecordsRequest,
+  GetRecordsResult => AWSGetRecordsResult,
+  GetShardIteratorRequest => AWSGetShardIteratorRequest,
+  GetShardIteratorResult => AWSGetShardIteratorResult,
+  ListStreamsRequest => AWSListStreamsRequest,
+  ListStreamsResult => AWSListStreamsResult,
+  ListTagsForStreamRequest => AWSListTagsForStreamRequest,
+  ListTagsForStreamResult => AWSListTagsForStreamResult,
+  MergeShardsRequest => AWSMergeShardsRequest,
+  PutRecordRequest => AWSPutRecordRequest,
+  PutRecordResult => AWSPutRecordResult,
+  PutRecordsRequest => AWSPutRecordsRequest,
+  PutRecordsRequestEntry => AWSPutRecordsRequestEntry,
+  PutRecordsResult => AWSPutRecordsResult,
+  RemoveTagsFromStreamRequest => AWSRemoveTagsFromStreamRequest,
+  SplitShardRequest => AWSSplitShardRequest}
+
 import scala.collection.JavaConverters._
-
-import com.amazonaws.services.kinesis.model.{AddTagsToStreamRequest => AWSAddTagsToStreamRequest}
-import com.amazonaws.services.kinesis.model.{CreateStreamRequest => AWSCreateStreamRequest}
-import com.amazonaws.services.kinesis.model.{DeleteStreamRequest => AWSDeleteStreamRequest}
-import com.amazonaws.services.kinesis.model.{DescribeStreamRequest => AWSDescribeStreamRequest}
-import com.amazonaws.services.kinesis.model.{DescribeStreamResult => AWSDescribeStreamResult}
-import com.amazonaws.services.kinesis.model.{GetShardIteratorRequest => AWSGetShardIteratorRequest}
-import com.amazonaws.services.kinesis.model.{GetShardIteratorResult => AWSGetShardIteratorResult}
-import com.amazonaws.services.kinesis.model.{GetRecordsRequest => AWSGetRecordsRequest}
-import com.amazonaws.services.kinesis.model.{GetRecordsResult => AWSGetRecordsResult}
-import com.amazonaws.services.kinesis.model.{ListStreamsRequest => AWSListStreamsRequest}
-import com.amazonaws.services.kinesis.model.{ListStreamsResult => AWSListStreamsResult}
-import com.amazonaws.services.kinesis.model.{ListTagsForStreamRequest => AWSListTagsForStreamRequest}
-import com.amazonaws.services.kinesis.model.{ListTagsForStreamResult => AWSListTagsForStreamResult}
-import com.amazonaws.services.kinesis.model.{MergeShardsRequest => AWSMergeShardsRequest}
-import com.amazonaws.services.kinesis.model.{PutRecordRequest => AWSPutRecordRequest}
-import com.amazonaws.services.kinesis.model.{PutRecordResult => AWSPutRecordResult}
-import com.amazonaws.services.kinesis.model.{PutRecordsRequest => AWSPutRecordsRequest}
-import com.amazonaws.services.kinesis.model.{PutRecordsResult => AWSPutRecordsResult}
-import com.amazonaws.services.kinesis.model.{PutRecordsRequestEntry => AWSPutRecordsRequestEntry}
-import com.amazonaws.services.kinesis.model.{RemoveTagsFromStreamRequest => AWSRemoveTagsFromStreamRequest}
-import com.amazonaws.services.kinesis.model.{SplitShardRequest => AWSSplitShardRequest}
-
 import scala.language.implicitConversions
 
 package object kinesis {
-
-  type AmazonKinesisClient = com.amazonaws.services.kinesis.AmazonKinesisClient
 
   case class AddTagsToStreamRequest(streamName: String, tags: Map[String, String])
 
@@ -232,8 +231,14 @@ package object kinesis {
     )
   }
 
+  val recordsMaxCount = 500
+  val recordMaxDataSize = 1024 * 1024
+  val recordsMaxDataSize = 1024 * 1024 * 5
+
   case class PutRecordsRequest(streamName: String, records: Seq[PutRecordsEntry])
-  case class PutRecordsEntry(partitionKey: String, data: Array[Byte], explicitHashKey: Option[String] = None)
+  case class PutRecordsEntry(partitionKey: String, data: Array[Byte], explicitHashKey: Option[String] = None){
+    val recordSize = partitionKey.getBytes.length + data.length
+  }
 
   implicit def convertPutRecordsRequest(request: PutRecordsRequest): AWSPutRecordsRequest = {
     val entries = request.records.map { entry =>
