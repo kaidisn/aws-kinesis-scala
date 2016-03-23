@@ -18,7 +18,7 @@ trait PutRecordAction {
   def withPutsRetry(records: Seq[PutRecordsEntry], retryLimit: Int = DEFAULT_MAX_ERROR_RETRY)
                    (f: Seq[PutRecordsEntry] => PutRecordsResult): Seq[Either[PutRecordsResultEntry, PutRecordsResultEntry]] = {
 
-    val buffer = new ArrayBuffer[Either[PutRecordsResultEntry, PutRecordsResultEntry]](records.size)
+    val buffer = ArrayBuffer[Either[PutRecordsResultEntry, PutRecordsResultEntry]](Nil.padTo(records.size, null): _*)
 
     @tailrec
     def put0(records: Seq[(PutRecordsEntry, Int)], retry: Int = 0): Unit = {
