@@ -19,6 +19,9 @@ object AmazonKinesisClient {
   def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesisClient = {
     new AmazonKinesisClient(new AWSKinesisClient(credentials, config).withRegion(region)) with PutRecordAction
   }
+  def apply(client: AWSKinesisClient): AmazonKinesisClient = {
+    new AmazonKinesisClient(client) with PutRecordAction
+  }
 }
 
 class AmazonKinesisClient(client: AWSKinesisClient) {

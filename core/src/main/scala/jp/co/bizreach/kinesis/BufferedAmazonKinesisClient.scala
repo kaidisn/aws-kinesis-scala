@@ -19,6 +19,9 @@ object BufferedAmazonKinesisClient {
   def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration, amount: Int, interval: Long)(implicit region: Regions): BufferedAmazonKinesisClient = {
     new BufferedAmazonKinesisClient(AmazonKinesisClient(credentials, config), amount, interval)
   }
+  def apply(client: AmazonKinesisClient, amount: Int, interval: Long): BufferedAmazonKinesisClient = {
+    new BufferedAmazonKinesisClient(client, amount, interval)
+  }
 }
 
 // TODO Would like to provide DiskBufferClient also
