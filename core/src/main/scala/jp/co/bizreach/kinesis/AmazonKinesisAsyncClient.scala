@@ -26,6 +26,9 @@ object AmazonKinesisAsyncClient {
   def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesisAsyncClient = {
     new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(credentials, config).withRegion(region))
   }
+  def apply(client: AWSKinesisAsyncClient): AmazonKinesisAsyncClient = {
+    new AmazonKinesisAsyncClient(client)
+  }
 }
 
 /**
