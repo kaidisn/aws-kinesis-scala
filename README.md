@@ -2,7 +2,7 @@ aws-kinesis-scala
 ========
 
 Scala client for Amazon Kinesis.
-Supports [Apache Spark](#apache-spark) write data to Kinesis (an input DStream using the KCL supports by Apache Spark).
+Supports [Apache Spark](#apache-spark) write data to Kinesis (an input DStream using the KCL supports by Spark Streaming Kinesis Integration).
 
 ## Installation
 
@@ -75,6 +75,18 @@ rdd.saveToKinesis(
   region     = Regions.AP_NORTHEAST_1,
   chunk      = 30
 )
+```
+
+You can also write data to Kinesis from Spark Streaming with DStreams.
+
+```scala
+import jp.co.bizreach.kinesis.spark._
+
+val dstream: DStream[Map[String, Option[Any]]] = ...
+
+dstream.foreachRDD { rdd =>
+  rdd.saveToKinesis( ... )
+}
 ```
 
 [Apache Spark]: http://spark.apache.org
