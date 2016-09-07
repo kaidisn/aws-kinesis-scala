@@ -3,7 +3,7 @@ aws-kinesis-scala
 
 Scala client for Amazon Kinesis with [Apache Spark](#apache-spark) support.
 
-For Apache Spark, reading from Kinesis is supported by Spark Streaming Kinesis Integration, but it does not support writing to Kinesis. This library makes possible to write Spark's RDD and Spark Streaming's DStream into Kinesis.
+For Apache Spark, reading from Kinesis is supported by Spark Streaming Kinesis Integration, but it does not support writing to Kinesis. This library makes possible to write Spark's RDD and Spark Streaming's DStream to Kinesis.
 
 ## Installation
 
