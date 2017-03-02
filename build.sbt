@@ -2,7 +2,7 @@ name := "aws-kinesis-scala"
 
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "0.0.4-SNAPSHOT",
+  version := "0.0.4",
   scalaVersion := "2.11.8",
   crossScalaVersions := Seq(scalaVersion.value, "2.12.1"),
   resolvers ++= Seq(),
