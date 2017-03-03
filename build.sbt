@@ -8,10 +8,13 @@ lazy val commonSettings = Seq(
   resolvers ++= Seq(),
   libraryDependencies ++= Seq(),
   scalacOptions ++= Seq("-feature", "-deprecation"),
-  publishTo <<= version { (v: String) =>
+  publishTo := {
     val nexus = "https://oss.sonatype.org/"
-    if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
-    else                             Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    if (version.value.endsWith("SNAPSHOT")){
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    } else {
+      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    }
   },
   publishArtifact in Test := false,
   publishMavenStyle := true,
