@@ -2,7 +2,7 @@ name := "aws-kinesis-scala"
 
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "0.0.4",
+  version := "0.0.5-SNAPSHOT",
   scalaVersion := "2.11.8",
   crossScalaVersions := Seq(scalaVersion.value, "2.12.1"),
   resolvers ++= Seq(),
@@ -69,7 +69,7 @@ lazy val spark = project
   .settings(
     name := "aws-kinesis-spark",
     libraryDependencies ++= Seq(
-      "org.apache.spark" % "spark-core_2.11" % "2.0.2" % "provided"
+      "org.apache.spark" % "spark-core_2.11" % "2.1.0" % "provided"
     )
   ).dependsOn(core)
 
