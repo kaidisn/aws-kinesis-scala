@@ -243,7 +243,10 @@ package object kinesis {
   val recordMaxDataSize = 1024 * 1024
   val recordsMaxDataSize = 1024 * 1024 * 5
 
-  case class PutRecordsRequest(streamName: String, records: Seq[PutRecordsEntry])
+  case class PutRecordsRequest(streamName: String,
+                               records: Seq[PutRecordsEntry],
+                               requestMetricCollector: Option[RequestMetricCollector] = None)
+
   case class PutRecordsEntry(partitionKey: String, data: Array[Byte], explicitHashKey: Option[String] = None){
     val recordSize = partitionKey.getBytes.length + data.length
   }
@@ -262,6 +265,7 @@ package object kinesis {
     val awsRequest = new AWSPutRecordsRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setRecords(entries.asJava)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
