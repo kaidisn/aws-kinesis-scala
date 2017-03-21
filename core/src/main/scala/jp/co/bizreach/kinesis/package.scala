@@ -32,33 +32,44 @@ import scala.language.implicitConversions
 
 package object kinesis {
 
-  case class AddTagsToStreamRequest(streamName: String, tags: Map[String, String])
+  case class AddTagsToStreamRequest(streamName: String,
+                                    tags: Map[String, String],
+                                    requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertAddTagsToStreamRequest(request: AddTagsToStreamRequest): AWSAddTagsToStreamRequest = {
     val awsRequest = new AWSAddTagsToStreamRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setTags(request.tags.asJava)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
-  case class CreateStreamRequest(streamName: String, shardCount: Int)
+  case class CreateStreamRequest(streamName: String,
+                                 shardCount: Int,
+                                 requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertCreateStreamRequest(request: CreateStreamRequest): AWSCreateStreamRequest = {
     val awsRequest = new AWSCreateStreamRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setShardCount(request.shardCount)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
-  case class DeleteStreamRequest(streamName: String)
+  case class DeleteStreamRequest(streamName: String,
+                                 requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertDeleteStreamRequest(request: DeleteStreamRequest): AWSDeleteStreamRequest = {
     val awsRequest = new AWSDeleteStreamRequest()
     awsRequest.setStreamName(request.streamName)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
-  case class DescribeStreamRequest(streamName: String, limit: Option[Int] = None, exclusiveStartShardId: Option[String] = None)
+  case class DescribeStreamRequest(streamName: String,
+                                   limit: Option[Int] = None,
+                                   exclusiveStartShardId: Option[String] = None,
+                                   requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertDescribeStreamRequest(request: DescribeStreamRequest): AWSDescribeStreamRequest = {
     val awsRequest = new AWSDescribeStreamRequest()
@@ -66,9 +77,8 @@ package object kinesis {
     request.limit.foreach { limit =>
       awsRequest.setLimit(limit)
     }
-    request.exclusiveStartShardId.foreach { exclusiveStartShardId =>
-      awsRequest.setExclusiveStartShardId(exclusiveStartShardId)
-    }
+    request.exclusiveStartShardId.foreach(awsRequest.setExclusiveStartShardId)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
@@ -104,7 +114,9 @@ package object kinesis {
     )
   }
 
-  case class GetRecordsRequest(shardIterator: String, limit: Option[Int] = None)
+  case class GetRecordsRequest(shardIterator: String,
+                               limit: Option[Int] = None,
+                               requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertGetRecordsRequest(request: GetRecordsRequest): AWSGetRecordsRequest = {
     val awsRequest = new AWSGetRecordsRequest()
@@ -112,6 +124,7 @@ package object kinesis {
     request.limit.foreach { limit =>
       awsRequest.setLimit(limit)
     }
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
@@ -132,15 +145,17 @@ package object kinesis {
     )
   }
 
-  case class GetShardIteratorRequest(streamName: String, shardId: String, shardIteratorType: Option[String] = None)
+  case class GetShardIteratorRequest(streamName: String,
+                                     shardId: String,
+                                     shardIteratorType: Option[String] = None,
+                                     requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertGetShardIteratorRequest(request: GetShardIteratorRequest): AWSGetShardIteratorRequest = {
     val awsRequest = new AWSGetShardIteratorRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setShardId(request.shardId)
-    request.shardIteratorType.foreach { shardIteratorType =>
-      awsRequest.setShardIteratorType(shardIteratorType)
-    }
+    request.shardIteratorType.foreach(awsRequest.setShardIteratorType)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
@@ -150,16 +165,17 @@ package object kinesis {
     GetShardIteratorResult(result.getShardIterator)
   }
 
-  case class ListStreamsRequest(limit: Option[Int] = None, exclusiveStartStreamName: Option[String] = None)
+  case class ListStreamsRequest(limit: Option[Int] = None,
+                                exclusiveStartStreamName: Option[String] = None,
+                                requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertListStreamsRequest(request: ListStreamsRequest): AWSListStreamsRequest = {
     val awsRequest = new AWSListStreamsRequest()
     request.limit.foreach { limit =>
       awsRequest.setLimit(limit)
     }
-    request.exclusiveStartStreamName.foreach { exclusiveStartStreamName =>
-      awsRequest.setExclusiveStartStreamName(exclusiveStartStreamName)
-    }
+    request.exclusiveStartStreamName.foreach(awsRequest.setExclusiveStartStreamName)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
@@ -172,17 +188,19 @@ package object kinesis {
     )
   }
 
-  case class ListTagsForStreamRequest(streamName: String, exclusiveStartTagKey: Option[String] = None, limit: Option[Int] = None)
+  case class ListTagsForStreamRequest(streamName: String,
+                                      exclusiveStartTagKey: Option[String] = None,
+                                      limit: Option[Int] = None,
+                                      requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertListTagsForStreamRequest(request: ListTagsForStreamRequest): AWSListTagsForStreamRequest = {
     val awsRequest = new AWSListTagsForStreamRequest()
     awsRequest.setStreamName(request.streamName)
-    request.exclusiveStartTagKey.foreach { exclusiveStartTagKey =>
-      awsRequest.setExclusiveStartTagKey(exclusiveStartTagKey)
-    }
+    request.exclusiveStartTagKey.foreach(awsRequest.setExclusiveStartTagKey)
     request.limit.foreach { limit =>
       awsRequest.setLimit(limit)
     }
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
@@ -198,13 +216,17 @@ package object kinesis {
     )
   }
 
-  case class MergeShardsRequest(streamName: String, shardToMerge: String, adjacentShardToMerge: String)
+  case class MergeShardsRequest(streamName: String,
+                                shardToMerge: String,
+                                adjacentShardToMerge: String,
+                                requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertMergeShardsRequest(request: MergeShardsRequest): AWSMergeShardsRequest = {
     val awsRequest = new AWSMergeShardsRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setShardToMerge(request.shardToMerge)
     awsRequest.setAdjacentShardToMerge(request.adjacentShardToMerge)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
@@ -220,13 +242,9 @@ package object kinesis {
     awsRequest.setStreamName(request.streamName)
     awsRequest.setData(ByteBuffer.wrap(request.data))
     awsRequest.setPartitionKey(request.partitionKey)
+    request.explicitHashKey.foreach(awsRequest.setExplicitHashKey)
+    request.sequenceNumberForOrdering.foreach(awsRequest.setSequenceNumberForOrdering)
     request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
-    request.explicitHashKey.foreach { explicitHashKey =>
-      awsRequest.setExplicitHashKey(explicitHashKey)
-    }
-    request.sequenceNumberForOrdering.foreach { sequenceNumberForOrdering =>
-      awsRequest.setSequenceNumberForOrdering(sequenceNumberForOrdering)
-    }
     awsRequest
   }
 
@@ -256,9 +274,7 @@ package object kinesis {
       val awsEntry = new AWSPutRecordsRequestEntry()
       awsEntry.setPartitionKey(entry.partitionKey)
       awsEntry.setData(ByteBuffer.wrap(entry.data))
-      entry.explicitHashKey.foreach { explicitHashKey =>
-        awsEntry.setExplicitHashKey(explicitHashKey)
-      }
+      entry.explicitHashKey.foreach(awsEntry.setExplicitHashKey)
       awsEntry
     }
 
@@ -286,22 +302,29 @@ package object kinesis {
     )
   }
 
-  case class RemoveTagsFromStreamRequest(streamName: String, tagKeys: Seq[String])
+  case class RemoveTagsFromStreamRequest(streamName: String,
+                                         tagKeys: Seq[String],
+                                         requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertRemoveTagsFromStreamRequest(request: RemoveTagsFromStreamRequest): AWSRemoveTagsFromStreamRequest = {
     val awsRequest = new AWSRemoveTagsFromStreamRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setTagKeys(request.tagKeys.asJava)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
-  case class SplitShardRequest(streamName: String, shardToSplit: String, newStartingHashKey: String)
+  case class SplitShardRequest(streamName: String,
+                               shardToSplit: String,
+                               newStartingHashKey: String,
+                               requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertSplitShardRequest(request: SplitShardRequest): AWSSplitShardRequest = {
     val awsRequest = new AWSSplitShardRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setShardToSplit(request.shardToSplit)
     awsRequest.setNewStartingHashKey(request.newStartingHashKey)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
