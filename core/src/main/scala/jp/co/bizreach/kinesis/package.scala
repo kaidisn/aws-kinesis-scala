@@ -25,6 +25,8 @@ import com.amazonaws.services.kinesis.model.{
   RemoveTagsFromStreamRequest => AWSRemoveTagsFromStreamRequest,
   SplitShardRequest => AWSSplitShardRequest}
 
+import com.amazonaws.metrics.RequestMetricCollector
+
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
@@ -178,7 +180,7 @@ package object kinesis {
     request.exclusiveStartTagKey.foreach { exclusiveStartTagKey =>
       awsRequest.setExclusiveStartTagKey(exclusiveStartTagKey)
     }
-    request.limit.foreach { limit => 
+    request.limit.foreach { limit =>
       awsRequest.setLimit(limit)
     }
     awsRequest
@@ -206,13 +208,19 @@ package object kinesis {
     awsRequest
   }
 
-  case class PutRecordRequest(streamName: String, partitionKey: String, data: Array[Byte], explicitHashKey: Option[String] = None, sequenceNumberForOrdering: Option[String] = None)
+  case class PutRecordRequest(streamName: String,
+                              partitionKey: String,
+                              data: Array[Byte],
+                              explicitHashKey: Option[String] = None,
+                              sequenceNumberForOrdering: Option[String] = None,
+                              requestMetricCollector: Option[RequestMetricCollector] = None)
 
   implicit def convertPutRecordRequest(request: PutRecordRequest): AWSPutRecordRequest = {
     val awsRequest = new AWSPutRecordRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setData(ByteBuffer.wrap(request.data))
     awsRequest.setPartitionKey(request.partitionKey)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     request.explicitHashKey.foreach { explicitHashKey =>
       awsRequest.setExplicitHashKey(explicitHashKey)
     }
@@ -235,7 +243,10 @@ package object kinesis {
   val recordMaxDataSize = 1024 * 1024
   val recordsMaxDataSize = 1024 * 1024 * 5
 
-  case class PutRecordsRequest(streamName: String, records: Seq[PutRecordsEntry])
+  case class PutRecordsRequest(streamName: String,
+                               records: Seq[PutRecordsEntry],
+                               requestMetricCollector: Option[RequestMetricCollector] = None)
+
   case class PutRecordsEntry(partitionKey: String, data: Array[Byte], explicitHashKey: Option[String] = None){
     val recordSize = partitionKey.getBytes.length + data.length
   }
@@ -245,7 +256,7 @@ package object kinesis {
       val awsEntry = new AWSPutRecordsRequestEntry()
       awsEntry.setPartitionKey(entry.partitionKey)
       awsEntry.setData(ByteBuffer.wrap(entry.data))
-      entry.explicitHashKey.foreach { explicitHashKey => 
+      entry.explicitHashKey.foreach { explicitHashKey =>
         awsEntry.setExplicitHashKey(explicitHashKey)
       }
       awsEntry
@@ -254,6 +265,7 @@ package object kinesis {
     val awsRequest = new AWSPutRecordsRequest()
     awsRequest.setStreamName(request.streamName)
     awsRequest.setRecords(entries.asJava)
+    request.requestMetricCollector.foreach(awsRequest.setRequestMetricCollector)
     awsRequest
   }
 
