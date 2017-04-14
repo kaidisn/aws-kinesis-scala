@@ -4,7 +4,7 @@ import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.handlers.AsyncHandler
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.kinesis.{AmazonKinesisAsyncClient => AWSKinesisAsyncClient}
+import com.amazonaws.services.kinesis.{AmazonKinesisAsync => AWSKinesisAsync, AmazonKinesisAsyncClientBuilder}
 import com.amazonaws.services.kinesis.model.{
   PutRecordRequest => AWSPutRecordRequest,
   PutRecordResult => AWSPutRecordResult,
@@ -13,28 +13,40 @@ import com.amazonaws.services.kinesis.model.{
 
 import scala.concurrent._
 
-object AmazonKinesisAsyncClient {
-  def apply()(implicit region: Regions): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient().withRegion(region))
+object AmazonKinesisAsync {
+  def apply()(implicit region: Regions): AmazonKinesisAsync = {
+    new AmazonKinesisAsync(AmazonKinesisAsyncClientBuilder.standard
+      .withRegion(region)
+      .build())
   }
-  def apply(credentials: AWSCredentialsProvider)(implicit region: Regions): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(credentials).withRegion(region))
+  def apply(credentials: AWSCredentialsProvider)(implicit region: Regions): AmazonKinesisAsync = {
+    new AmazonKinesisAsync(AmazonKinesisAsyncClientBuilder.standard
+      .withCredentials(credentials)
+      .withRegion(region)
+      .build())
   }
-  def apply(config: ClientConfiguration)(implicit region: Regions): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(config).withRegion(region))
+  def apply(config: ClientConfiguration)(implicit region: Regions): AmazonKinesisAsync = {
+    new AmazonKinesisAsync(AmazonKinesisAsyncClientBuilder.standard
+      .withClientConfiguration(config)
+      .withRegion(region)
+      .build())
   }
-  def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(new AWSKinesisAsyncClient(credentials, config).withRegion(region))
+  def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesisAsync = {
+    new AmazonKinesisAsync(AmazonKinesisAsyncClientBuilder.standard
+      .withCredentials(credentials)
+      .withClientConfiguration(config)
+      .withRegion(region)
+      .build())
   }
-  def apply(client: AWSKinesisAsyncClient): AmazonKinesisAsyncClient = {
-    new AmazonKinesisAsyncClient(client)
+  def apply(client: AWSKinesisAsync): AmazonKinesisAsync = {
+    new AmazonKinesisAsync(client)
   }
 }
 
 /**
- * Trial implementation of AmazonKinesisAsyncClient for Scala. 
+ * Trial implementation of AmazonKinesisAsync for Scala.
  */
-class AmazonKinesisAsyncClient(client: AWSKinesisAsyncClient) {
+class AmazonKinesisAsync(client: AWSKinesisAsync) {
 
   def putRecordAsync(request: PutRecordRequest): Future[PutRecordResult] = {
     val p = Promise[PutRecordResult]

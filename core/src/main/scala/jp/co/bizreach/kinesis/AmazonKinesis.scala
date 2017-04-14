@@ -3,28 +3,40 @@ package jp.co.bizreach.kinesis
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.kinesis.{AmazonKinesisClient => AWSKinesisClient}
+import com.amazonaws.services.kinesis.{AmazonKinesis => AWSKinesis, AmazonKinesisClientBuilder}
 import jp.co.bizreach.kinesis.action.PutRecordAction
 
-object AmazonKinesisClient {
-  def apply()(implicit region: Regions): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient().withRegion(region)) with PutRecordAction
+object AmazonKinesis {
+  def apply()(implicit region: Regions): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withRegion(region)
+      .build()) with PutRecordAction
   }
-  def apply(credentials: AWSCredentialsProvider)(implicit region: Regions): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient(credentials).withRegion(region)) with PutRecordAction
+  def apply(credentials: AWSCredentialsProvider)(implicit region: Regions): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withCredentials(credentials)
+      .withRegion(region)
+      .build()) with PutRecordAction
   }
-  def apply(config: ClientConfiguration)(implicit region: Regions): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient(config).withRegion(region)) with PutRecordAction
+  def apply(config: ClientConfiguration)(implicit region: Regions): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withClientConfiguration(config)
+      .withRegion(region)
+      .build()) with PutRecordAction
   }
-  def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesisClient = {
-    new AmazonKinesisClient(new AWSKinesisClient(credentials, config).withRegion(region)) with PutRecordAction
+  def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withCredentials(credentials)
+      .withClientConfiguration(config)
+      .withRegion(region)
+      .build()) with PutRecordAction
   }
-  def apply(client: AWSKinesisClient): AmazonKinesisClient = {
-    new AmazonKinesisClient(client) with PutRecordAction
+  def apply(client: AWSKinesis): AmazonKinesis = {
+    new AmazonKinesis(client) with PutRecordAction
   }
 }
 
-class AmazonKinesisClient(client: AWSKinesisClient) {
+class AmazonKinesis(client: AWSKinesis) {
   self: PutRecordAction =>
 
   /**

@@ -32,6 +32,20 @@ import scala.language.implicitConversions
 
 package object kinesis {
 
+  @deprecated("Use type `AmazonKinesis` instead of `AmazonKinesisClient`", "0.0.6")
+  type AmazonKinesisClient = AmazonKinesis
+  @deprecated("Use object `AmazonKinesis` instead of `AmazonKinesisClient`", "0.0.6")
+  val AmazonKinesisClient = AmazonKinesis
+  @deprecated("Use type `AmazonKinesisAsync` instead of `AmazonKinesisAsyncClient`", "0.0.6")
+  type AmazonKinesisAsyncClient = AmazonKinesisAsync
+  @deprecated("Use object `AmazonKinesisAsync` instead of `AmazonKinesisAsyncClient`", "0.0.6")
+  val AmazonKinesisAsyncClient = AmazonKinesisAsync
+  @deprecated("Use type `BufferedAmazonKinesis` instead of `BufferedAmazonKinesisClient`", "0.0.6")
+  type BufferedAmazonKinesisClient = BufferedAmazonKinesis
+  @deprecated("Use object `BufferedAmazonKinesis` instead of `BufferedAmazonKinesisClient`", "0.0.6")
+  val BufferedAmazonKinesisClient = BufferedAmazonKinesis
+
+
   case class AddTagsToStreamRequest(streamName: String,
                                     tags: Map[String, String],
                                     requestMetricCollector: Option[RequestMetricCollector] = None)
