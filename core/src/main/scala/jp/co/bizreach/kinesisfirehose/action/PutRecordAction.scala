@@ -1,27 +1,27 @@
-package jp.co.bizreach.kinesis.action
+package jp.co.bizreach.kinesisfirehose.action
 
 import com.amazonaws.retry.PredefinedRetryPolicies.DEFAULT_MAX_ERROR_RETRY
-import com.amazonaws.services.kinesis.model.ProvisionedThroughputExceededException
+import com.amazonaws.services.kinesisfirehose.model.ServiceUnavailableException
 
-import jp.co.bizreach.kinesis._
+import jp.co.bizreach.kinesisfirehose._
 import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
-import scala.math.pow
+import scala.math._
 import scala.util.Random
 
 trait PutRecordAction {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
-  def withPutsRetry(records: Seq[PutRecordsEntry], retryLimit: Int = DEFAULT_MAX_ERROR_RETRY)
-                   (f: Seq[PutRecordsEntry] => PutRecordsResult): Seq[Either[PutRecordsResultEntry, PutRecordsResultEntry]] = {
+  def withPutBatchRetry(records: Seq[Array[Byte]], retryLimit: Int = DEFAULT_MAX_ERROR_RETRY)
+                       (f: Seq[Array[Byte]] => PutRecordBatchResult): Seq[Either[PutRecordBatchResponseEntry, PutRecordBatchResponseEntry]] = {
 
-    val buffer = ArrayBuffer[Either[PutRecordsResultEntry, PutRecordsResultEntry]](Nil.padTo(records.size, null): _*)
+    val buffer = ArrayBuffer[Either[PutRecordBatchResponseEntry, PutRecordBatchResponseEntry]](Nil.padTo(records.size, null): _*)
 
     @tailrec
-    def put0(records: Seq[(PutRecordsEntry, Int)], retry: Int = 0): Unit = {
+    def put0(records: Seq[(Array[Byte], Int)], retry: Int = 0): Unit = {
       val result = f(records.map(_._1))
 
       val failed = records zip result.records flatMap {
@@ -54,7 +54,7 @@ trait PutRecordAction {
       try
         Right(f)
       catch {
-        case e: ProvisionedThroughputExceededException => if (retry >= retryLimit) Left(e) else {
+        case e: ServiceUnavailableException => if (retry >= retryLimit) Left(e) else {
           Thread.sleep(sleepDuration(retry, retryLimit))
           logger.warn(s"Retrying the put request. Retry count: ${retry + 1}")
           put0(retry + 1)
