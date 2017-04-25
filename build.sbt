@@ -6,7 +6,9 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.8",
   crossScalaVersions := Seq(scalaVersion.value, "2.12.1"),
   resolvers ++= Seq(),
-  libraryDependencies ++= Seq(),
+  libraryDependencies ++= Seq(
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  ),
   scalacOptions ++= Seq("-feature", "-deprecation"),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
