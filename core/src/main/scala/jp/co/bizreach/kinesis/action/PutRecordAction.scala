@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.{ExecutionContext, Future}
 import scala.math.pow
 import scala.util.Random
 
@@ -24,27 +25,48 @@ trait PutRecordAction {
     def put0(records: Seq[(PutRecordsEntry, Int)], retry: Int = 0): Unit = {
       val result = f(records.map(_._1))
 
-      val failed = records zip result.records flatMap {
-        case ((_, i), entry) if Option(entry.errorCode).isEmpty =>
-          buffer(i) = Right(entry)
-          None
-        case ((record, i), entry) =>
-          buffer(i) = Left(entry)
-          Some(record -> i)
-      }
+      val failed = addResultBuffer(records, result, buffer)
 
       // success, or exceed the upper limit of the retry
       if (failed.isEmpty || retry >= retryLimit) ()
       // retry
       else {
         Thread.sleep(sleepDuration(retry, retryLimit))
-        logger.warn(s"Retrying to put records. Retry count: ${retry + 1}")
+        logger.warn(s"Retrying the put requests. Retry count: ${retry + 1}")
         put0(failed, retry + 1)
       }
     }
 
     put0(records.zipWithIndex)
     buffer.toList
+  }
+
+  def withPutsAsyncRetry(records: Seq[PutRecordsEntry], retryLimit: Int = DEFAULT_MAX_ERROR_RETRY)
+                        (f: Seq[PutRecordsEntry] => Future[PutRecordsResult])
+                        (implicit ec: ExecutionContext): Future[Seq[Either[PutRecordsResultEntry, PutRecordsResultEntry]]] = {
+
+    val buffer = ArrayBuffer[Either[PutRecordsResultEntry, PutRecordsResultEntry]](Nil.padTo(records.size, null): _*)
+
+    (0 until retryLimit).foldLeft(
+      Future.successful(records.zipWithIndex)
+    ){
+      (remaining, retry) => remaining.flatMap {
+        // success
+        case Nil => Future.successful(Nil)
+        // first run or retry
+        case records =>
+          f(records.map(_._1)).map { result =>
+            val failed = addResultBuffer(records, result, buffer)
+
+            if (failed.nonEmpty) {
+              Thread.sleep(sleepDuration(retry, retryLimit))
+              logger.warn(s"Retrying the put requests. Retry count: ${retry + 1}")
+            }
+
+            failed
+          }
+      }
+    }.map(_ => buffer.toList)
   }
 
   def withPutRetry(retryLimit: Int = DEFAULT_MAX_ERROR_RETRY)
@@ -56,13 +78,24 @@ trait PutRecordAction {
       catch {
         case e: ProvisionedThroughputExceededException => if (retry >= retryLimit) Left(e) else {
           Thread.sleep(sleepDuration(retry, retryLimit))
-          logger.warn(s"Retrying to put records. Retry count: ${retry + 1}")
+          logger.warn(s"Retrying the put request. Retry count: ${retry + 1}")
           put0(retry + 1)
         }
       }
     }
 
     put0()
+  }
+
+  def withPutAsyncRetry(retryLimit: Int = DEFAULT_MAX_ERROR_RETRY)
+                       (f: => Future[PutRecordResult])
+                       (implicit ec: ExecutionContext): Future[PutRecordResult] = {
+    (0 until retryLimit).foldLeft(f)((res, retry) => res.recoverWith {
+      case e: ProvisionedThroughputExceededException =>
+        Thread.sleep(sleepDuration(retry, retryLimit))
+        logger.warn(s"Retrying the put request. Retry count: ${retry + 1}")
+        f
+    })
   }
 
   protected def sleepDuration(retry: Int, retryLimit: Int): Long = {
@@ -72,6 +105,20 @@ trait PutRecordAction {
     val durations = (0 until retryLimit).map(n => pow(2, n) * d)
 
     (durations(retry) * 1000).toLong
+  }
+
+  // returns failed entries
+  private def addResultBuffer(records: Seq[(PutRecordsEntry, Int)],
+                              result: PutRecordsResult,
+                              buffer: ArrayBuffer[Either[PutRecordsResultEntry, PutRecordsResultEntry]]) = {
+    records zip result.records flatMap {
+      case ((_, i), entry) if Option(entry.errorCode).isEmpty =>
+        buffer(i) = Right(entry)
+        None
+      case ((record, i), entry) =>
+        buffer(i) = Left(entry)
+        Some(record -> i)
+    }
   }
 
 }

@@ -59,11 +59,11 @@ class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
 }
 
 object KinesisRDDWriter {
-  private val cache = collection.concurrent.TrieMap.empty[Regions, AmazonKinesisClient]
+  private val cache = collection.concurrent.TrieMap.empty[Regions, AmazonKinesis]
 
-  private val client: Class[_ <: AWSCredentialsProvider] => Regions => AmazonKinesisClient = {
+  private val client: Class[_ <: AWSCredentialsProvider] => Regions => AmazonKinesis = {
     credentials => implicit region =>
-      cache.getOrElseUpdate(region, AmazonKinesisClient(credentials.getConstructor().newInstance()))
+      cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance()))
   }
 
 }
