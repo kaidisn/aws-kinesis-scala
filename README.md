@@ -1,4 +1,4 @@
-aws-kinesis-scala
+aws-kinesis-scala [![Build Status](https://travis-ci.org/bizreach/aws-kinesis-scala.svg?branch=master)](https://travis-ci.org/bizreach/aws-kinesis-scala)
 ========
 
 Scala client for Amazon Kinesis with [Apache Spark](#apache-spark) support.
@@ -11,17 +11,17 @@ Add a following dependency into your `build.sbt`.
 
 core only:
 ```scala
-libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-scala" % "0.0.5"
+libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-scala" % "0.0.6"
 ```
 
 use spark integration:
 ```scala
-libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-spark" % "0.0.5"
+libraryDependencies += "jp.co.bizreach" %% "aws-kinesis-spark" % "0.0.6"
 ```
 
 ## Usage
 
-Create the `AmazonKinesisClient` at first.
+Create the `AmazonKinesis` at first.
 
 ```scala
 import jp.co.bizreach.kinesis._
@@ -29,16 +29,16 @@ import jp.co.bizreach.kinesis._
 implicit val region = Regions.AP_NORTHEAST_1
 
 // use DefaultAWSCredentialsProviderChain
-val client = AmazonKinesisClient()
+val client = AmazonKinesis()
 
 // specify an explicit Provider
-val client = AmazonKinesisClient(new InstanceProfileCredentialsProvider())
+val client = AmazonKinesis(new InstanceProfileCredentialsProvider())
 
 // specify an explicit client configuration
-val client = AmazonKinesisClient(new ClientConfiguration().withProxyHost("proxyHost"))
+val client = AmazonKinesis(new ClientConfiguration().withProxyHost("proxyHost"))
 
 // both
-val client = AmazonKinesisClient(
+val client = AmazonKinesis(
   new InstanceProfileCredentialsProvider(),
   new ClientConfiguration().withProxyHost("proxyHost")
 )
@@ -51,6 +51,36 @@ val request = PutRecordRequest(
   streamName   = "streamName",
   partitionKey = "partitionKey",
   data         = "data".getBytes("UTF-8")
+)
+
+// not retry
+client.putRecord(request)
+
+// if failure, max retry count is 3 (SDK default)
+client.putRecordWithRetry(request)
+```
+
+### Amazon Kinesis Firehose
+
+Create the `AmazonKinesisFirehose` at first.
+
+```scala
+import jp.co.bizreach.kinesisfirehose._
+
+implicit val region = Regions.US_EAST_1
+
+// use DefaultAWSCredentialsProviderChain
+val client = AmazonKinesisFirehose()
+
+... as with kinesis ...
+```
+
+Then you can access Kinesis Firehose as following:
+
+```scala
+val request = PutRecordRequest(
+  deliveryStreamName = "firehose-example",
+  record             = "data".getBytes("UTF-8")
 )
 
 // not retry
