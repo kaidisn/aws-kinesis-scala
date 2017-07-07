@@ -17,7 +17,7 @@ class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
 
   val write = (task: TaskContext, data: Iterator[A]) => {
     // send data, including retry
-    def put(a: Seq[PutRecordsEntry]) = endpoint.map(e => KinesisRDDWriter.endpointClient(e)(region))
+    def put(a: Seq[PutRecordsEntry]) = endpoint.map(e => KinesisRDDWriter.endpointClient(credentials)(e)(region))
       .getOrElse(KinesisRDDWriter.client(credentials)(region))
       .putRecordsWithRetry(PutRecordsRequest(streamName, a))
       .zipWithIndex.collect { case (Left(e), i) => a(i) -> s"${e.errorCode}: ${e.errorMessage}" }
@@ -70,9 +70,9 @@ object KinesisRDDWriter {
       cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance()))
   }
 
-  private val endpointClient: String => Regions => AmazonKinesis  = {
-    endpoint => implicit region =>
-      endpointCache.getOrElseUpdate(endpoint, AmazonKinesis(new EndpointConfiguration(endpoint, region.toString)))
+  private val endpointClient: Class[_ <: AWSCredentialsProvider] => String => Regions => AmazonKinesis  = {
+    credentials => endpoint => implicit region =>
+      endpointCache.getOrElseUpdate(endpoint, AmazonKinesis(credentials.getConstructor().newInstance(), new EndpointConfiguration(endpoint, region.toString)))
   }
 
 }

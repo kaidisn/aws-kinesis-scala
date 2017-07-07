@@ -36,6 +36,12 @@ object AmazonKinesis {
       .withEndpointConfiguration(endpointConfiguration)
       .build()) with PutRecordAction
   }
+  def apply(credentials: AWSCredentialsProvider, endpointConfiguration: EndpointConfiguration): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withCredentials(credentials)
+      .withEndpointConfiguration(endpointConfiguration)
+      .build()) with PutRecordAction
+  }
   def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration)(implicit region: Regions): AmazonKinesis = {
     new AmazonKinesis(AmazonKinesisClientBuilder.standard
       .withCredentials(credentials)
