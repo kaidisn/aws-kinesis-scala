@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory
 
 class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
                                     credentials: Class[_ <: AWSCredentialsProvider],
-                                    chunk: Int) extends Serializable {
+                                    chunk: Int, client: Option[AmazonKinesis]) extends Serializable {
   private val logger = LoggerFactory.getLogger(getClass)
 
   val write = (task: TaskContext, data: Iterator[A]) => {
     // send data, including retry
-    def put(a: Seq[PutRecordsEntry]) = KinesisRDDWriter.client(credentials)(region)
+    def put(a: Seq[PutRecordsEntry]) = client.getOrElse(KinesisRDDWriter.client(credentials)(region))
       .putRecordsWithRetry(PutRecordsRequest(streamName, a))
       .zipWithIndex.collect { case (Left(e), i) => a(i) -> s"${e.errorCode}: ${e.errorMessage}" }
 

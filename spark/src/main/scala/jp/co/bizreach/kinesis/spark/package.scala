@@ -1,6 +1,7 @@
 package jp.co.bizreach.kinesis
 
-import com.amazonaws.auth.{DefaultAWSCredentialsProviderChain, AWSCredentialsProvider}
+import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
 import org.apache.spark.rdd.RDD
 
@@ -21,9 +22,10 @@ package object spark {
      */
     def saveToKinesis(streamName: String, region: Regions,
                       credentials: Class[_ <: AWSCredentialsProvider] = classOf[DefaultAWSCredentialsProviderChain],
-                      chunk: Int = recordsMaxCount): Unit =
+                      chunk: Int = recordsMaxCount,
+                      client: Option[AmazonKinesis] = Option.empty): Unit =
       if (!rdd.isEmpty) rdd.sparkContext.runJob(rdd,
-        new KinesisRDDWriter(streamName, region, credentials, chunk).write)
+        new KinesisRDDWriter(streamName, region, credentials, chunk, client).write)
   }
 
 }

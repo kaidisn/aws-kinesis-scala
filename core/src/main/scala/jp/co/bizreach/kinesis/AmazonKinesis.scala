@@ -2,8 +2,9 @@ package jp.co.bizreach.kinesis
 
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.kinesis.{AmazonKinesis => AWSKinesis, AmazonKinesisClientBuilder}
+import com.amazonaws.services.kinesis.{AmazonKinesisClientBuilder, AmazonKinesis => AWSKinesis}
 import jp.co.bizreach.kinesis.action.PutRecordAction
 
 object AmazonKinesis {
@@ -18,9 +19,22 @@ object AmazonKinesis {
       .withRegion(region)
       .build()) with PutRecordAction
   }
+  def apply(endpointConfiguration: EndpointConfiguration)(implicit region: Regions): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withEndpointConfiguration(endpointConfiguration)
+      .withRegion(region)
+      .build()) with PutRecordAction
+  }
   def apply(config: ClientConfiguration)(implicit region: Regions): AmazonKinesis = {
     new AmazonKinesis(AmazonKinesisClientBuilder.standard
       .withClientConfiguration(config)
+      .withRegion(region)
+      .build()) with PutRecordAction
+  }
+  def apply(config: ClientConfiguration, endpointConfiguration: EndpointConfiguration)(implicit region: Regions): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withClientConfiguration(config)
+      .withEndpointConfiguration(endpointConfiguration)
       .withRegion(region)
       .build()) with PutRecordAction
   }
@@ -28,6 +42,14 @@ object AmazonKinesis {
     new AmazonKinesis(AmazonKinesisClientBuilder.standard
       .withCredentials(credentials)
       .withClientConfiguration(config)
+      .withRegion(region)
+      .build()) with PutRecordAction
+  }
+  def apply(credentials: AWSCredentialsProvider, config: ClientConfiguration, endpointConfiguration: EndpointConfiguration)(implicit region: Regions): AmazonKinesis = {
+    new AmazonKinesis(AmazonKinesisClientBuilder.standard
+      .withCredentials(credentials)
+      .withClientConfiguration(config)
+      .withEndpointConfiguration(endpointConfiguration)
       .withRegion(region)
       .build()) with PutRecordAction
   }
