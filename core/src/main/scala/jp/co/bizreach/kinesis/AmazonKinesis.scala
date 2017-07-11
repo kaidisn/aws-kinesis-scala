@@ -61,7 +61,7 @@ object AmazonKinesis {
   }
 }
 
-class AmazonKinesis(client: AWSKinesis) extends Serializable{
+class AmazonKinesis(client: AWSKinesis){
   self: PutRecordAction =>
 
   /**
