@@ -1,22 +1,24 @@
 package jp.co.bizreach.kinesis.spark
 
 import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
 import jp.co.bizreach.kinesis._
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.spark.TaskContext
 import org.json4s.jackson.JsonMethods
-import org.json4s.{Extraction, Formats, DefaultFormats}
+import org.json4s.{DefaultFormats, Extraction, Formats}
 import org.slf4j.LoggerFactory
 
 class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
                                     credentials: Class[_ <: AWSCredentialsProvider],
-                                    chunk: Int, client: Option[AmazonKinesis]) extends Serializable {
+                                    chunk: Int, endpoint: Option[String]) extends Serializable {
   private val logger = LoggerFactory.getLogger(getClass)
 
   val write = (task: TaskContext, data: Iterator[A]) => {
     // send data, including retry
-    def put(a: Seq[PutRecordsEntry]) = client.getOrElse(KinesisRDDWriter.client(credentials)(region))
+    def put(a: Seq[PutRecordsEntry]) = endpoint.map(e => KinesisRDDWriter.endpointClient(credentials)(e)(region))
+      .getOrElse(KinesisRDDWriter.client(credentials)(region))
       .putRecordsWithRetry(PutRecordsRequest(streamName, a))
       .zipWithIndex.collect { case (Left(e), i) => a(i) -> s"${e.errorCode}: ${e.errorMessage}" }
 
@@ -61,9 +63,15 @@ class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
 object KinesisRDDWriter {
   private val cache = collection.concurrent.TrieMap.empty[Regions, AmazonKinesis]
 
+
   private val client: Class[_ <: AWSCredentialsProvider] => Regions => AmazonKinesis = {
     credentials => implicit region =>
       cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance()))
+  }
+
+  private val endpointClient: Class[_ <: AWSCredentialsProvider] => String => Regions => AmazonKinesis  = {
+    credentials => endpoint => implicit region =>
+      cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance(), new EndpointConfiguration(endpoint, region.getName)))
   }
 
 }

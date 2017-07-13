@@ -23,9 +23,9 @@ package object spark {
     def saveToKinesis(streamName: String, region: Regions,
                       credentials: Class[_ <: AWSCredentialsProvider] = classOf[DefaultAWSCredentialsProviderChain],
                       chunk: Int = recordsMaxCount,
-                      client: Option[AmazonKinesis] = Option.empty): Unit =
+                      endpoint: Option[String] = Option.empty): Unit =
       if (!rdd.isEmpty) rdd.sparkContext.runJob(rdd,
-        new KinesisRDDWriter(streamName, region, credentials, chunk, client).write)
+        new KinesisRDDWriter(streamName, region, credentials, chunk, endpoint).write)
   }
 
 }
