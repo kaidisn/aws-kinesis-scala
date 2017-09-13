@@ -59,7 +59,7 @@ lazy val core = project
   .settings(
     name := "aws-kinesis-scala",
     libraryDependencies ++= Seq(
-      "com.amazonaws" %  "aws-java-sdk-kinesis" % "1.11.171",
+      "com.amazonaws" %  "aws-java-sdk-kinesis" % "1.11.194",
       "org.slf4j"     %  "slf4j-api"            % "1.7.25",
       "org.scalatest" %% "scalatest"            % "3.0.3" % "test"
     )
