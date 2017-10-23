@@ -2,9 +2,9 @@ name := "aws-kinesis-scala"
 
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "0.0.8",
-  scalaVersion := "2.11.8",
-  crossScalaVersions := Seq(scalaVersion.value, "2.12.3"),
+  version := "0.0.9-SNAPSHOT",
+  scalaVersion := "2.11.11",
+  crossScalaVersions := Seq(scalaVersion.value, "2.12.4"),
   resolvers ++= Seq(),
   libraryDependencies ++= Seq(),
   scalacOptions ++= Seq("-feature", "-deprecation"),
@@ -61,7 +61,7 @@ lazy val core = project
     libraryDependencies ++= Seq(
       "com.amazonaws" %  "aws-java-sdk-kinesis" % "1.11.194",
       "org.slf4j"     %  "slf4j-api"            % "1.7.25",
-      "org.scalatest" %% "scalatest"            % "3.0.3" % "test"
+      "org.scalatest" %% "scalatest"            % "3.0.4" % "test"
     )
   )
 
