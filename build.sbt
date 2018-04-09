@@ -3,8 +3,8 @@ name := "aws-kinesis-scala"
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
   version := "0.0.9-SNAPSHOT",
-  scalaVersion := "2.11.11",
-  crossScalaVersions := Seq(scalaVersion.value, "2.12.4"),
+  scalaVersion := "2.11.12",
+  crossScalaVersions := Seq(scalaVersion.value, "2.12.5"),
   resolvers ++= Seq(),
   libraryDependencies ++= Seq(),
   scalacOptions ++= Seq("-feature", "-deprecation"),
@@ -59,9 +59,9 @@ lazy val core = project
   .settings(
     name := "aws-kinesis-scala",
     libraryDependencies ++= Seq(
-      "com.amazonaws" %  "aws-java-sdk-kinesis" % "1.11.194",
+      "com.amazonaws" %  "aws-java-sdk-kinesis" % "1.11.311",
       "org.slf4j"     %  "slf4j-api"            % "1.7.25",
-      "org.scalatest" %% "scalatest"            % "3.0.4" % "test"
+      "org.scalatest" %% "scalatest"            % "3.0.5" % "test"
     )
   )
 
@@ -70,7 +70,7 @@ lazy val spark = project
   .settings(
     name := "aws-kinesis-spark",
     libraryDependencies ++= Seq(
-      "org.apache.spark" % "spark-core_2.11" % "2.2.0" % "provided"
+      "org.apache.spark" % "spark-core_2.11" % "2.3.0" % "provided"
     )
   ).dependsOn(core)
 
