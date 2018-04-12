@@ -32,6 +32,10 @@ lazy val commonSettings = Seq(
       </developer>
     </developers>
   ),
+  sonatypeProfileName := organization.value,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  releaseTagName := (version in ThisBuild).value,
+  releaseCrossBuild := true,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,
