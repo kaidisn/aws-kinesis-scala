@@ -1,31 +1,18 @@
+import ReleaseTransformations._
+
 name := "aws-kinesis-scala"
 
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "0.0.9-SNAPSHOT",
   scalaVersion := "2.11.12",
   crossScalaVersions := Seq(scalaVersion.value, "2.12.5"),
-  resolvers ++= Seq(),
-  libraryDependencies ++= Seq(),
   scalacOptions ++= Seq("-feature", "-deprecation"),
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (version.value.endsWith("SNAPSHOT")){
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    } else {
-      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-    }
-  },
+  publishTo := sonatypePublishTo.value,
   publishArtifact in Test := false,
   publishMavenStyle := true,
+  homepage := Some(url(s"https://github.com/bizreach/aws-kinesis-scala")),
+  licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")),
   pomExtra := (
-    <url>https://github.com/bizreach/aws-kinesis-scala</url>
-    <licenses>
-      <license>
-        <name>The Apache Software License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      </license>
-    </licenses>
     <scm>
       <url>https://github.com/bizreach/aws-kinesis-scala</url>
       <connection>scm:git:https://github.com/bizreach/aws-kinesis-scala.git</connection>
@@ -44,6 +31,19 @@ lazy val commonSettings = Seq(
         <timezone>+9</timezone>
       </developer>
     </developers>
+  ),
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    publishArtifacts,
+    releaseStepCommand("sonatypeRelease"),
+    setNextVersion,
+    commitNextVersion,
+    pushChanges
   )
 )
 
