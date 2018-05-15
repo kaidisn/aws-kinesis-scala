@@ -1,7 +1,6 @@
 package jp.co.bizreach.kinesis
 
 import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
 import org.apache.spark.rdd.RDD
 
