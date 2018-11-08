@@ -2,7 +2,7 @@ package jp.co.bizreach.kinesis.spark
 
 import com.amazonaws.auth._
 
-sealed trait SparkAWSCredentials {
+sealed trait SparkAWSCredentials extends Serializable {
   // The AWS credentials will be discovered on the workers
   def provider: AWSCredentialsProvider
 }
