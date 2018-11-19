@@ -15,7 +15,7 @@ lazy val root = (project in file("."))
   )
 
 val sdkVersion = "1.11.443"
-val sparkVersion = "2.3.0"
+val sparkVersion = "2.4.0"
 
 lazy val core = project
   .settings(commonSettings: _*)
@@ -33,8 +33,8 @@ lazy val spark = project
   .settings(
     name := "aws-kinesis-spark",
     libraryDependencies ++= Seq(
-      "org.apache.spark" % "spark-core_2.11"  % "2.3.0" % "provided",
-      "com.amazonaws"    % "aws-java-sdk-sts" % sdkVersion
+      "org.apache.spark" %% "spark-core"  % sparkVersion % "provided",
+      "com.amazonaws"    %  "aws-java-sdk-sts" % sdkVersion
     )
   ).dependsOn(core % "compile->compile;test->test")
 
