@@ -1,6 +1,5 @@
 package jp.co.bizreach.kinesis.spark
 
-import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
 import jp.co.bizreach.kinesis._
@@ -11,7 +10,7 @@ import org.json4s.{DefaultFormats, Extraction, Formats}
 import org.slf4j.LoggerFactory
 
 class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
-                                    credentials: Class[_ <: AWSCredentialsProvider],
+                                    credentials: SparkAWSCredentials,
                                     chunk: Int, endpoint: Option[String]) extends Serializable {
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -64,14 +63,14 @@ object KinesisRDDWriter {
   private val cache = collection.concurrent.TrieMap.empty[Regions, AmazonKinesis]
 
 
-  private val client: Class[_ <: AWSCredentialsProvider] => Regions => AmazonKinesis = {
+  private val client: SparkAWSCredentials => Regions => AmazonKinesis = {
     credentials => implicit region =>
-      cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance()))
+      cache.getOrElseUpdate(region, AmazonKinesis(credentials.provider))
   }
 
-  private val endpointClient: Class[_ <: AWSCredentialsProvider] => String => Regions => AmazonKinesis  = {
+  private val endpointClient: SparkAWSCredentials => String => Regions => AmazonKinesis = {
     credentials => endpoint => implicit region =>
-      cache.getOrElseUpdate(region, AmazonKinesis(credentials.getConstructor().newInstance(), new EndpointConfiguration(endpoint, region.getName)))
+      cache.getOrElseUpdate(region, AmazonKinesis(credentials.provider, new EndpointConfiguration(endpoint, region.getName)))
   }
 
 }
