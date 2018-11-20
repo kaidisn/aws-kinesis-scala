@@ -22,7 +22,7 @@ package object spark {
                       chunk: Int = recordsMaxCount,
                       endpoint: Option[String] = None): Unit =
       if (!rdd.isEmpty) rdd.sparkContext.runJob(rdd,
-        new KinesisRDDWriter(streamName, region, credentials, chunk, endpoint).write)
+        new KinesisRDDWriter(streamName, region, credentials, chunk, endpoint).write _)
   }
 
 }
