@@ -14,7 +14,7 @@ class KinesisRDDWriter[A <: AnyRef](streamName: String, region: Regions,
                                     chunk: Int, endpoint: Option[String]) extends Serializable {
   private val logger = LoggerFactory.getLogger(getClass)
 
-  val write = (task: TaskContext, data: Iterator[A]) => {
+  def write(task: TaskContext, data: Iterator[A]): Unit = {
     // send data, including retry
     def put(a: Seq[PutRecordsEntry]) = endpoint.map(e => KinesisRDDWriter.endpointClient(credentials)(e)(region))
       .getOrElse(KinesisRDDWriter.client(credentials)(region))
